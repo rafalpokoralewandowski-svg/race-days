@@ -57,6 +57,29 @@ the calendar as calendar.json in a PRIVATE GitHub repository of yours.
      Without the QR: make a second token on the iPhone in Safari (same steps as b) and paste it
      into Sync in the app together with the repository name.
 
+4. ANDROID PHONES
+  Install: open the app's address in Chrome, tap the three dots (top right), then
+  Add to Home screen or Install app, and confirm. Samsung Internet: menu, Add page to,
+  Home screen. Sync: on the computer choose Sync > Show QR for phone, scan it with the
+  Android camera (or Google Lens) and tap the link, then Connect. On Android the installed
+  app shares Chrome's storage, so there is no copy-and-paste step.
+
+
+5. SHARE THE CALENDAR VIEW-ONLY (for example with family)
+  a. On github.com make one more token, the same way as in 3b but named for example
+     "Race Days view-only": Only select repositories > race-days-data, then
+     Permissions > Add permissions > Contents and LEAVE it on Read-only. Copy it.
+  b. On a connected device open Sync > Share view-only and paste the read-only token.
+     Check the App address underneath is your app's web address.
+  c. Let them scan the QR code, or use Send link / Copy link to send it in a message.
+     On their phone the link opens the calendar: Open calendar, then add it to the Home
+     screen (Android: three dots > Add to Home screen; iPhone: follow the copy-and-paste
+     steps the page shows).
+  d. They see your changes within about a minute while online and cannot change anything.
+     To stop sharing, delete that read-only token on GitHub (Settings > Developer settings >
+     Personal access tokens > Fine-grained tokens). The link contains the token, so anyone
+     who gets the link can see the calendar until you delete it.
+
 How it behaves
   - A change on one device is saved to GitHub within a few seconds. The other device picks it
     up when you open it or switch back to it, and every minute while it's open and online.
