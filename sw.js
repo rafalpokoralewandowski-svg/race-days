@@ -1,5 +1,5 @@
 // Race Days offline cache. Bump VERSION when index.html changes so phones pick up the new copy.
-const VERSION = "race-days-20261001-0956";
+const VERSION = "race-days-20261001-1836";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icons/apple-touch-icon.png",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png", "./icons/favicon-32.png"];
 self.addEventListener("install", e => {

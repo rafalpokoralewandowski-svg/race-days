@@ -323,6 +323,23 @@ label.dc:hover{box-shadow:inset 0 0 0 1px var(--muted)}
 #pairBox[hidden]{display:none}
 @media (max-width:560px){.sy-qr{grid-template-columns:1fr}}
 #pairTitle:focus{outline:none}
+#syFields[hidden],#syHelp[hidden]{display:none}
+.sy-share{width:100%;margin-top:4px;font-size:14px;line-height:1.45}
+.sy-share[hidden]{display:none}
+.sy-share>p{margin:0 0 8px}
+.sy-share label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.sy-share label input{border:1px solid var(--rule);border-radius:5px;padding:7px 9px;background:var(--paper);color:var(--ink);font-size:15px}
+.sy-share .err{margin:0 0 8px}
+.sy-share .sy-pair{margin:4px 0 8px}
+.viewonly #addBtn,.viewonly #seriesBtn,.viewonly .plate-ctrl,.viewonly [data-act=import],.viewonly [data-act=reset]{display:none!important}
+.viewonly .stc select,.viewonly .dc .dsel{display:none}
+.viewonly .stc{cursor:default}.viewonly .stc:hover{box-shadow:none}
+@media (max-width:760px){.sy-share label input{font-size:16px}}
+.form{grid-template-columns:repeat(2,minmax(0,1fr))}
+.form>label{min-width:0}
+.form input,.form select,.form textarea{min-width:0;width:100%;box-sizing:border-box}
+.form .inline input{width:auto}.form .inline .swatch{width:30px}
+@media (max-width:560px){.form{grid-template-columns:minmax(0,1fr)}}
 .form input[readonly]{color:var(--muted)}
 #syTitle:focus{outline:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -343,6 +360,7 @@ label.dc:hover{box-shadow:inset 0 0 0 1px var(--muted)}
       <button class="btn primary" id="addBtn">Add event</button>
       <button class="btn" id="seriesBtn">Manage series</button>
       <button class="btn" id="syncBtn" hidden data-state="off" aria-haspopup="dialog"><span class="sy-dot" aria-hidden="true"></span>Sync</button>
+      <button class="btn" id="installBtn" hidden>Install app</button>
       <div class="menu">
         <button class="btn" id="moreBtn" aria-haspopup="true" aria-expanded="false">More</button>
         <div class="menu-list" id="moreMenu" hidden>
@@ -469,21 +487,36 @@ label.dc:hover{box-shadow:inset 0 0 0 1px var(--muted)}
 <dialog id="syDlg" aria-labelledby="syTitle">
   <form class="dlg" id="syForm" method="dialog" novalidate>
     <h2 id="syTitle" tabindex="-1" autofocus>Sync with GitHub</h2>
-    <p class="sy-lead">Keeps this calendar the same on your computer and your iPhone. It is saved as one file, calendar.json, in a private GitHub repository of yours, and every save stays in the repository's history.</p>
+    <p class="sy-lead" id="syLead">Keeps this calendar the same on your computer and your phone. It is saved as one file, calendar.json, in a private GitHub repository of yours, and every save stays in the repository's history.</p>
     <div class="sy-state" id="syState" hidden></div>
     <div class="sy-pair" id="syPair" hidden>
-      <button type="button" class="btn" id="syQr" aria-expanded="false">Show QR for iPhone</button>
+      <button type="button" class="btn" id="syQr" aria-expanded="false">Show QR for phone</button>
       <button type="button" class="btn" id="syCode">Copy setup code</button>
+      <button type="button" class="btn" id="syShare" aria-expanded="false">Share view-only</button>
       <div class="sy-qr" id="syQrBox" hidden>
         <div class="sy-qr-img" id="syQrImg" role="img" aria-label="QR code with the setup link"></div>
         <div class="sy-qr-txt">
-          <p>On the iPhone, open the Camera, point it at this code and tap the link that appears. The page it opens copies the setup code for the Race Days app.</p>
+          <p>On the phone, open the camera (on Android the camera or Google Lens), point it at this code and tap the link that appears. Android connects right there; on iPhone the page copies the setup code for the Race Days app.</p>
           <label>App address (where Race Days is online)<input id="syQrUrl" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
           <p class="sy-qr-warn">The code contains your token. Hide it when you're done.</p>
         </div>
       </div>
+      <div class="sy-share" id="syShareBox" hidden>
+        <p>Let someone see this calendar on their phone, Android or iPhone, without being able to change it. On GitHub, make one more token the same way as yours but leave <b>Contents</b> on <b>Read-only</b>, then paste it here.</p>
+        <label>Read-only token<input id="syViewTok" type="password" placeholder="github_pat_…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></label>
+        <label>App address (where Race Days is online)<input id="syShareUrl" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
+        <p class="err" id="syShareErr"></p>
+        <div class="sy-qr" id="syShareOut" hidden>
+          <div class="sy-qr-img" id="syShareQr" role="img" aria-label="QR code with the view-only link"></div>
+          <div class="sy-qr-txt">
+            <p>Scan it with their phone camera, or send them the link. It opens the calendar view-only and keeps it up to date.</p>
+            <div class="sy-pair"><button type="button" class="btn primary" id="syShareSend">Send link…</button><button type="button" class="btn" id="syShareCopy">Copy link</button><button type="button" class="btn" id="syShareImg">Save QR image</button></div>
+            <p class="sy-qr-warn">Anyone with this link can see the calendar, not change it, until you delete that read-only token on GitHub.</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="form">
+    <div class="form" id="syFields">
       <label class="full">Repository<input name="repo" placeholder="your-name/race-days-data" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></label>
       <label class="full"><span id="syTokLbl">Access token or setup code</span><input name="token" type="password" placeholder="github_pat_…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></label>
       <label class="full">This device is called<input name="device" maxlength="24" placeholder="Desktop"></label>
@@ -494,7 +527,7 @@ label.dc:hover{box-shadow:inset 0 0 0 1px var(--muted)}
       <li>Sign in at github.com (a free account is enough) and create a new repository, for example race-days-data. Set it to <b>Private</b> and tick <b>Add a README</b>.</li>
       <li>Make an access token: <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</a>. Under Repository access choose <b>Only select repositories</b> and pick race-days-data. Under Permissions → Repository permissions set <b>Contents</b> to <b>Read and write</b>. Pick an expiry, generate it and copy the token.</li>
       <li>Here, enter your-name/race-days-data and paste the token, then Connect. The first device you connect uploads its calendar.</li>
-      <li>Connect your iPhone: once this device is connected, choose Show QR for iPhone here and scan it with the iPhone camera. That device then loads the calendar from GitHub.</li>
+      <li>Connect your phone: once this device is connected, choose Show QR for phone here and scan it with the phone's camera. That device then loads the calendar from GitHub.</li>
     </ol></details>
     <p class="err" id="syErr"></p>
     <div class="dlg-foot">
@@ -522,6 +555,8 @@ const DATA_FILE = "endurance-gt-calendar-data.json", HOSTED = /^https?:$/.test(l
 const UA = navigator.userAgent;
 const DEVICE_NOUN = /iPhone|iPod/.test(UA) ? "iPhone" : (/iPad/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) ? "iPad" : /Android/.test(UA) ? "phone" : "computer";
 const STANDALONE = !!navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+const ANDROID = DEVICE_NOUN === "phone", IOS = DEVICE_NOUN === "iPhone" || DEVICE_NOUN === "iPad";
+const COPY_TO_APP = IOS && !STANDALONE;   // iOS Home Screen apps have their own storage; Android/desktop installed apps share the browser's
 const SAVED_TXT = STANDALONE ? `Saved on this ${DEVICE_NOUN}` : "Saved in this browser";
 const DEVICE_DEFAULT = DEVICE_NOUN === "computer" ? "Desktop" : DEVICE_NOUN === "phone" ? "Phone" : DEVICE_NOUN;
 const DEFAULT = JSON.parse(document.getElementById("default-state").textContent);
@@ -677,6 +712,7 @@ const SYNC_ERR = {
   format: "Sync paused: calendar.json isn't a calendar",
   rate: "GitHub is busy, syncing shortly",
   http: "Sync failed, retrying",
+  empty: "Nothing shared yet",
 };
 const SYNC_HELP = {
   auth: "GitHub didn't accept the token. It may have expired or been revoked. Make a new one and paste it above, then Sync now.",
@@ -686,8 +722,20 @@ const SYNC_HELP = {
   rate: "GitHub asked the app to slow down. It will try again in a few minutes.",
   http: "GitHub returned an error. The app will try again shortly.",
   offline: "No connection to GitHub. Changes are kept on this device and sync when it's back online.",
+  empty: "The repository doesn't contain a calendar yet. Connect the owner's device first.",
+};
+const VIEW_HELP = {
+  auth: "This shared link has stopped working: the owner removed its access. Ask for a new link and open it on this phone.",
+  repo: "The shared calendar can't be found any more. Ask for a new link.",
+  perm: "The shared calendar can't be read with this link. Ask for a new link.",
+  offline: "No connection right now. You're seeing the last version this phone received.",
 };
 const deviceName = () => (sync && sync.device) || DEVICE_DEFAULT;
+function viewOnly(){ return !!(sync && sync.mode === "view"); }
+function applyMode(){
+  const v = viewOnly(); document.documentElement.classList.toggle("viewonly", v);
+  const b = $("#syncBtn"); if (b && b.lastChild) b.lastChild.nodeValue = v ? "View-only" : "Sync";
+}
 const b64enc = s => { const u = new TextEncoder().encode(s); let b = ""; for (let i = 0; i < u.length; i += 0x8000) b += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(b); };
 const b64dec = s => new TextDecoder().decode(Uint8Array.from(atob(String(s).replace(/\s+/g, "")), c => c.charCodeAt(0)));
 function stable(x){
@@ -755,6 +803,7 @@ async function pull(){
 }
 async function repoOk(){ const r = await gh("GET", ""); if (r.ok) return true; if (r.status === 404) return false; throw ghErr(r); }
 async function push(data, sha){
+  if (viewOnly()) throw { kind: "perm" };   // a view-only device never writes
   const body = { message: `Race Days: saved on ${deviceName()}`, content: b64enc(JSON.stringify(data, null, 1) + "\n") };
   if (sha) body.sha = sha;
   const r = await gh("PUT", "/contents/" + encPath(sync.path), body);
@@ -780,7 +829,10 @@ function adopt(incoming, sha){
 const clock = t => { const d = new Date(t || Date.now()), n = new Date(); const hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`; return d.toDateString() === n.toDateString() ? hm : `${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} ${hm}`; };
 function syncStatus(kind){
   const b = $("#syncBtn");
+  applyMode();
   if (!sync) { if (b) b.dataset.state = "off"; return; }
+  if (viewOnly() && kind === "ok") { if (b) b.dataset.state = "ok"; setStatus(`View-only · updated ${clock(sync.at)}`); return; }
+  if (viewOnly() && kind === "err" && HALTS.includes(sync.halt)) { if (b) b.dataset.state = "err"; setStatus("Sharing stopped · ask for a new link", "warn"); return; }
   if (b) b.dataset.state = kind === "pending" ? "busy" : kind;
   if (kind === "busy") setStatus("Syncing…");
   else if (kind === "pending") setStatus("Saving…");
@@ -791,6 +843,7 @@ function syncStatus(kind){
 function localSaved(){
   localRev++;
   if (!sync) { setStatus(SAVED_TXT); return; }
+  if (viewOnly()) { setStatus("View-only · changes here aren't kept", "warn"); return; }
   sync.dirty = true; saveSync();
   if (sync.halt) { syncStatus("err"); return; }
   syncStatus("pending"); queueSync(1500);
@@ -804,6 +857,16 @@ async function runSync(manual){
   if (!manual && dialogOpen()) { queueSync(5000); return; }   // never swap the calendar under an open editor
   syncBusy = true; lastRun = Date.now(); syncStatus("busy");
   try {
+    if (viewOnly()) {   // pull only
+      const remote = await pull();
+      if (remote.missing) { if (!(await repoOk())) throw { kind: "repo" }; throw { kind: "empty" }; }
+      if (remote.sha !== sync.sha) {
+        if (!manual && (dialogOpen() || Date.now() - lastTouch < 2500)) { syncAgain = false; syncStatus("ok"); queueSync(4000); return; }
+        adopt(migrate(clone(remote.data)), remote.sha);
+      } else sync.at = Date.now();
+      sync.fail = null; sync.halt = null; sync.dirty = false; saveSync(); syncStatus("ok");
+      return;
+    }
     let done = false, deferred = false;
     for (let i = 0; i < 4 && !done; i++) {
       if (i === 0 && sync.dirty && sync.sha && await pushSnap(sync.sha)) { done = true; break; }
@@ -834,19 +897,26 @@ async function runSync(manual){
     const kind = e && e.kind ? e.kind : "offline";
     sync.fail = kind; if (HALTS.includes(kind)) sync.halt = kind; saveSync();
     syncStatus(kind === "offline" ? "offline" : "err");
-    if (kind === "rate") queueSync(5 * 60e3); else if (kind === "http") queueSync(60e3);
+    if (kind === "rate") queueSync(5 * 60e3); else if (kind === "http" || kind === "empty") queueSync(60e3);
   } finally {
     syncBusy = false;
     if (syncDlg.open) renderSyncDlg();
     if (syncAgain) { syncAgain = false; queueSync(50); }
   }
 }
-async function connect(repo, token, device){
+async function connect(repo, token, device, mode){
   const prev = sync;
-  sync = { repo, token, path: "calendar.json", device, sha: null, dirty: false, at: 0, fail: null, halt: null };
+  sync = { repo, token, path: "calendar.json", device, mode: mode === "view" ? "view" : "edit", sha: null, dirty: false, at: 0, fail: null, halt: null };
   syncBusy = true;
   try {
     const remote = await pull();
+    if (sync.mode === "view") {
+      if (remote.missing) { if (!(await repoOk())) throw { kind: "repo" }; throw { kind: "empty" }; }
+      const incoming = migrate(clone(remote.data));
+      if (!sameCal(state, DEFAULT) && !sameCal(state, incoming) && !(await ask(`Show the shared calendar on this ${DEVICE_NOUN === "computer" ? "browser" : DEVICE_NOUN}? It replaces the calendar that's here now.`, "Show shared calendar"))) throw { kind: "cancel" };
+      adopt(incoming, remote.sha); render();
+      return `Showing the calendar shared from ${repo}. It updates by itself.`;
+    }
     if (remote.missing) {
       if (!(await repoOk())) throw { kind: "repo" };
       state.device = device;
@@ -869,29 +939,40 @@ async function connect(repo, token, device){
   finally { syncBusy = false; if (sync) saveSync(); }
 }
 const syncDlg = $("#syDlg"), syForm = $("#syForm");
-const makeCode = () => CODE_PREFIX + b64enc(JSON.stringify({ r: sync.repo, t: sync.token, p: sync.path }));
+const makeCode = () => CODE_PREFIX + b64enc(JSON.stringify(viewOnly() ? { r: sync.repo, t: sync.token, p: sync.path, m: "view" } : { r: sync.repo, t: sync.token, p: sync.path }));
 function readCode(s){ s = String(s || "").trim(); if (!s.startsWith(CODE_PREFIX)) return null; try { const o = JSON.parse(b64dec(s.slice(CODE_PREFIX.length))); return o && o.r && o.t ? o : null; } catch { return null; } }
 const cleanRepo = s => String(s || "").trim().replace(/^https?:\/\/(www\.)?github\.com\//i, "").replace(/\.git$/i, "").replace(/\/+$/, "");
 function renderSyncDlg(){
-  const on = !!sync, st = $("#syState");
+  const on = !!sync, st = $("#syState"), v = viewOnly();
+  $("#syTitle").textContent = v ? "Shared calendar" : "Sync with GitHub";
+  $("#syLead").textContent = v ? `This calendar is shared with you view-only. It stays up to date by itself whenever this ${DEVICE_NOUN === "computer" ? "browser" : DEVICE_NOUN} is online.`
+    : "Keeps this calendar the same on your computer and your phone. It is saved as one file, calendar.json, in a private GitHub repository of yours, and every save stays in the repository's history.";
+  $("#syFields").hidden = v; $("#syHelp").hidden = v;
+  $("#syHint").textContent = IOS ? "From your computer: open Sync there, choose Show QR for phone and scan it with the Camera. The page that opens copies the setup code; then come back here, press and hold the box above, tap Paste and Connect."
+    : "From your computer: open Sync there, choose Show QR for phone and scan it with this phone's camera. The page that opens connects this phone straight away.";
   syForm.repo.readOnly = on;
   if (on) syForm.repo.value = sync.repo;
   $("#syTokLbl").textContent = on ? "New access token (only if the old one stopped working)" : DEVICE_NOUN === "computer" ? "Access token or setup code" : "Setup code from your computer, or access token";
   syForm.token.placeholder = on ? "Saved on this device" : "github_pat_…";
   $("#syOff").hidden = !on;
   $("#syHint").hidden = on || DEVICE_NOUN === "computer";
-  $("#syGo").textContent = on ? "Sync now" : "Connect";
+  $("#syGo").textContent = v ? "Refresh" : on ? "Sync now" : "Connect";
   $("#syHelp").open = !on && !syForm.repo.value && DEVICE_NOUN === "computer";
   st.hidden = !on;
   if (!on) { st.className = "sy-state"; $("#syCodeBox").hidden = true; $("#syPair").hidden = true; showQr(false); return; }
   const k = sync.halt || sync.fail, bad = !!k;
-  $("#syPair").hidden = !!sync.halt; if (sync.halt) showQr(false);
+  $("#syPair").hidden = !!sync.halt || v; if (sync.halt || v) { showQr(false); showShare(false); }
   st.className = "sy-state" + (bad ? " warn" : "");
+  if (v) {
+    st.innerHTML = `<p>View-only. Showing the calendar shared from <b>${esc(sync.repo)}</b>. ${sync.at ? `Updated ${esc(clock(sync.at))}.` : ""}</p>`
+      + (bad ? `<p class="sy-bad">${esc(VIEW_HELP[k] || SYNC_HELP[k] || "Problem reading the shared calendar.")}</p>` : `<p>Changes the owner makes appear here automatically. Nothing can be changed from this ${DEVICE_NOUN === "computer" ? "browser" : DEVICE_NOUN}.</p>`);
+    return;
+  }
   st.innerHTML = `<p>Connected to <b>${esc(sync.repo)}</b> as <b>${esc(deviceName())}</b>. ${sync.at ? `Last synced ${esc(clock(sync.at))}.` : "Not synced yet."}${sync.dirty && !bad ? " Changes waiting to sync." : ""}</p>`
-    + (bad ? `<p class="sy-bad">${esc(SYNC_HELP[k] || "Sync problem.")}</p>` : `<p>To add your iPhone, show the QR code below and scan it with the iPhone camera. The setup code holds your token, so keep it to your own devices.</p>`);
+    + (bad ? `<p class="sy-bad">${esc(SYNC_HELP[k] || "Sync problem.")}</p>` : `<p>To add your phone, show the QR code below and scan it with the phone's camera. To let someone else see the calendar without changing it, use Share view-only.</p>`);
 }
 function openSync(){
-  $("#syErr").textContent = ""; syForm.token.value = ""; $("#syCodeBox").hidden = true; showQr(false);
+  $("#syErr").textContent = ""; syForm.token.value = ""; $("#syCodeBox").hidden = true; showQr(false); showShare(false);
   syForm.device.value = deviceName();
   renderSyncDlg(); syncDlg.showModal();
 }
@@ -905,14 +986,18 @@ syForm.addEventListener("submit", async ev => {
   const tok = code ? code.t : syForm.token.value.trim();
   if (sync) {
     if (sync.device !== dev) { sync.device = dev; state.device = dev; lsSet(LS_KEY, state); }
-    if (tok) { if (code && code.r !== sync.repo) return err(`That setup code is for ${code.r}. Disconnect first to switch repositories.`); sync.token = tok; syForm.token.value = ""; }
+    if (tok) {
+      if (code && code.r !== sync.repo) return err(`That setup code is for ${code.r}. Disconnect first to switch repositories.`);
+      if (code && (code.m === "view") !== viewOnly()) return err("That code is for a different kind of access. Disconnect first, then paste it again.");
+      sync.token = tok; syForm.token.value = "";
+    }
     sync.halt = null; sync.fail = null; saveSync();
     $("#syGo").disabled = true;
     while (syncBusy) await new Promise(r => setTimeout(r, 120));
     await runSync(true);
     $("#syGo").disabled = false;
     renderSyncDlg();
-    if (!sync.fail) toast(`Synced ${clock(sync.at)}.`);
+    if (!sync.fail) toast(viewOnly() ? `Updated ${clock(sync.at)}.` : `Synced ${clock(sync.at)}.`);
     return;
   }
   const repo = cleanRepo(code ? code.r : syForm.repo.value);
@@ -920,8 +1005,9 @@ syForm.addEventListener("submit", async ev => {
   if (!tok) return err("Paste the access token from GitHub, or a setup code from your other device.");
   $("#syGo").disabled = true; setStatus("Connecting…");
   try {
-    const msg = await connect(repo, tok, dev);
+    const msg = await connect(repo, tok, dev, code && code.m === "view" ? "view" : "edit");
     syForm.token.value = ""; renderSyncDlg(); syncStatus("ok"); toast(msg);
+    if (viewOnly()) { syncDlg.close(); if (ANDROID && !STANDALONE) setTimeout(() => toast(installEvt ? "To keep it on your Home screen, tap Install app at the top." : "To keep it on your Home screen: in Chrome tap ⋮, then Add to Home screen."), 3600); }
   } catch (e) {
     const k = e && e.kind;
     if (k === "cancel") { setStatus(SAVED_TXT); }
@@ -930,7 +1016,7 @@ syForm.addEventListener("submit", async ev => {
 });
 $("#syClose").onclick = () => syncDlg.close();
 $("#syOff").onclick = async () => {
-  if (!(await ask(`Stop syncing this ${DEVICE_NOUN}? The calendar stays here as it is, and the copy in GitHub isn't touched.`, "Disconnect"))) return;
+  if (!(await ask(viewOnly() ? `Stop showing the shared calendar on this ${DEVICE_NOUN === "computer" ? "browser" : DEVICE_NOUN}? It stays here as last received but won't update.` : `Stop syncing this ${DEVICE_NOUN}? The calendar stays here as it is, and the copy in GitHub isn't touched.`, "Disconnect"))) return;
   sync = null; try { localStorage.removeItem(SYNC_KEY); localStorage.removeItem(SYNC_BASE_KEY); } catch {}
   clearTimeout(syncTimer); syncStatus("off"); setStatus(SAVED_TXT); renderSyncDlg(); toast("Sync is off on this device.");
 };
@@ -941,7 +1027,7 @@ $("#syCode").onclick = async () => {
 };
 
 /* ---------- pairing: QR on a connected device -> link opened on the iPhone ---------- */
-const PAIR_RE = /^#pair=([A-Za-z0-9-]+\/[A-Za-z0-9._-]+)~([A-Za-z0-9_]+)$/;
+const PAIR_RE = /^#(pair|view)=([A-Za-z0-9-]+\/[A-Za-z0-9._-]+)~([A-Za-z0-9_]+)$/;
 function appAddress(){
   if (/^https?:$/.test(location.protocol)) return location.origin + location.pathname;
   if (sync && sync.app) return sync.app;
@@ -957,7 +1043,8 @@ function renderQr(){
 }
 function showQr(on){
   const b = $("#syQr"); if (!b) return;
-  $("#syQrBox").hidden = !on; b.textContent = on ? "Hide QR code" : "Show QR for iPhone"; b.setAttribute("aria-expanded", String(on));
+  $("#syQrBox").hidden = !on; b.textContent = on ? "Hide QR code" : "Show QR for phone"; b.setAttribute("aria-expanded", String(on));
+  if (on) showShare(false);
   if (!on) { $("#syQrImg").innerHTML = ""; return; }
   $("#syQrUrl").value = appAddress(); renderQr();
 }
@@ -975,25 +1062,29 @@ function connectWithCode(code){
   syForm.token.value = code; syForm.token.dispatchEvent(new Event("input"));
   if (syForm.requestSubmit) syForm.requestSubmit(); else $("#syGo").click();
 }
-function openPair(repo){
-  const inApp = STANDALONE || DEVICE_NOUN === "computer";
-  const where = STANDALONE ? `this ${DEVICE_NOUN}` : "this browser";
+function openPair(repo, mode){
+  const view = mode === "view", here = DEVICE_NOUN === "computer" ? "this browser" : `this ${DEVICE_NOUN}`;
   $("#pairBox").hidden = true;
-  $("#pairLead").innerHTML = `This link carries the setup code for <b>${esc(repo)}</b>.`;
-  if (inApp) {
-    $("#pairSteps").innerHTML = `<li>Choose <b>Connect</b> to load your synced calendar on ${esc(where)}.</li>`;
-    $("#pairGo").textContent = "Connect"; $("#pairHere").hidden = true;
-  } else {
+  $("#pairTitle").textContent = view ? "Shared race calendar" : "Connect Race Days";
+  $("#pairLead").innerHTML = view
+    ? `This link opens the race calendar shared from <b>${esc(repo)}</b>. It's view-only: it keeps itself up to date, and nothing can be changed from ${esc(here)}.`
+    : `This link carries the setup code for <b>${esc(repo)}</b>.`;
+  const go = $("#pairGo");
+  if (!COPY_TO_APP) {   // Android, computer, or already inside the iPhone app: same storage as the installed app, so connect here
+    const install = ANDROID && !STANDALONE ? `<li>Keep it on your Home screen: in Chrome tap <b>⋮</b> then <b>Add to Home screen</b> or <b>Install app</b> (Samsung Internet: <b>☰</b> then <b>Add page to</b>, <b>Home screen</b>). It opens straight to this calendar.</li>` : "";
+    $("#pairSteps").innerHTML = (view ? `<li>Choose <b>Open calendar</b>.</li>` : `<li>Choose <b>Connect</b> to load your synced calendar on ${esc(here)}.</li>`) + install;
+    go.textContent = view ? "Open calendar" : "Connect"; go.dataset.act = "connect"; $("#pairHere").hidden = true;
+  } else {              // iPhone Safari: the Home Screen app keeps its own storage, so the code travels by clipboard
     $("#pairSteps").innerHTML = `<li>Tap <b>Copy setup code</b>.</li>`
       + `<li>Open <b>Race Days</b> from your Home Screen. Not there yet? Close this, tap Share (in newer Safari it's under •••), then <b>Add to Home Screen</b> and <b>Add</b>, and open it.</li>`
-      + `<li>In the app tap <b>Sync</b>, press and hold the token box, tap <b>Paste</b>, then <b>Connect</b>.</li>`;
-    $("#pairGo").textContent = "Copy setup code";
+      + `<li>In the app tap <b>${view ? "Sync" : "Sync"}</b>, press and hold the token box, tap <b>Paste</b>, then <b>Connect</b>.</li>`;
+    go.textContent = "Copy setup code"; go.dataset.act = "copy";
     $("#pairHere").hidden = false; $("#pairHere").textContent = "Use in Safari instead";
   }
   pairDlg.showModal();
 }
 $("#pairGo").onclick = async () => {
-  if ($("#pairGo").textContent === "Connect") return connectWithCode(pairCode);
+  if ($("#pairGo").dataset.act === "connect") return connectWithCode(pairCode);
   try { await navigator.clipboard.writeText(pairCode); $("#pairGo").textContent = "Copied"; toast("Setup code copied. Now open Race Days from your Home Screen."); }
   catch { const box = $("#pairBox"); box.value = pairCode; box.hidden = false; box.focus(); box.select(); toast("Copy the setup code shown in the box."); }
 };
@@ -1003,11 +1094,88 @@ function checkPair(){
   if (window.claude) return;
   const m = location.hash.match(PAIR_RE); if (!m) return;
   try { history.replaceState(null, "", location.pathname + location.search); } catch {}   // keep the token out of the address bar and any Home Screen bookmark
-  const [, repo, token] = m;
-  if (sync && sync.repo === repo) { toast(`Already connected to ${repo}.`); return; }
-  pairCode = CODE_PREFIX + b64enc(JSON.stringify({ r: repo, t: token, p: "calendar.json" }));
-  openPair(repo);
+  const [, kind, repo, token] = m, mode = kind === "view" ? "view" : "edit";
+  if (sync && sync.repo === repo) {
+    if ((sync.mode || "edit") !== mode) { toast(mode === "view" ? `This ${DEVICE_NOUN === "computer" ? "browser" : DEVICE_NOUN} already edits ${repo}; the view-only link isn't needed here.` : `Disconnect the shared view first, then open this link again.`); return; }
+    if (sync.token !== token || sync.halt) { sync.token = token; sync.halt = null; sync.fail = null; saveSync(); runSync(true); toast("Access updated."); return; }
+    toast(`Already connected to ${repo}.`); return;
+  }
+  pairCode = CODE_PREFIX + b64enc(JSON.stringify(mode === "view" ? { r: repo, t: token, p: "calendar.json", m: "view" } : { r: repo, t: token, p: "calendar.json" }));
+  openPair(repo, mode);
 }
+
+/* ---------- share view-only: read-only token -> link / QR / image ---------- */
+function shareBase(){ return ($("#syShareUrl").value.trim() || appAddress()).replace(/#.*$/, ""); }
+function shareLink(){ return `${shareBase()}#view=${sync.repo}~${sync.viewToken}`; }
+function shareQr(){ const q = qrcode(0, "M"); q.addData(shareLink()); q.make(); return q; }
+function renderShare(){
+  const has = !!(sync && sync.viewToken), out = $("#syShareOut");
+  $("#syViewTok").placeholder = has ? "Saved. Paste a new one to replace it" : "github_pat_…";
+  out.hidden = !has; if (!has) return;
+  if (!/^https?:\/\/[^\s/]+\.[^\s]+/.test(shareBase())) { $("#syShareQr").innerHTML = `<p>Enter the web address where Race Days is online, starting with https://</p>`; return; }
+  try { $("#syShareQr").innerHTML = shareQr().createSvgTag({ cellSize: 4, margin: 12, scalable: true }); }
+  catch { $("#syShareQr").innerHTML = `<p>Couldn't draw the code. Use Copy link instead.</p>`; }
+}
+function showShare(on){
+  const b = $("#syShare"); if (!b) return;
+  $("#syShareBox").hidden = !on; b.textContent = on ? "Hide sharing" : "Share view-only"; b.setAttribute("aria-expanded", String(on));
+  $("#syShareErr").textContent = ""; $("#syViewTok").value = "";
+  if (!on) { $("#syShareQr").innerHTML = ""; return; }
+  showQr(false); $("#syShareUrl").value = appAddress(); renderShare();
+}
+$("#syShare").onclick = () => showShare($("#syShareBox").hidden);
+$("#syShareUrl").addEventListener("input", () => {
+  const v = $("#syShareUrl").value.trim();
+  if (sync && /^https?:\/\//.test(v) && !/^https?:$/.test(location.protocol)) { sync.app = v; saveSync(); }
+  renderShare();
+});
+let shareCheck = null;
+$("#syViewTok").addEventListener("input", () => { clearTimeout(shareCheck); shareCheck = setTimeout(checkViewTok, 450); });
+async function checkViewTok(){
+  const tok = $("#syViewTok").value.trim(), err = s => { $("#syShareErr").textContent = s; };
+  err(""); if (!tok || !sync) return;
+  if (tok === sync.token) return err("That's this device's own token, which can change the calendar. Make a separate one with Contents left on Read-only.");
+  if (!/^(github_pat_|ghp_)[A-Za-z0-9_]{20,}$/.test(tok)) return err("That doesn't look like a GitHub token. It should start with github_pat_.");
+  let r;
+  try { r = await fetch(`https://api.github.com/repos/${sync.repo}/contents/${encPath(sync.path)}`, { cache: "no-store", headers: { "Accept": "application/vnd.github+json", "Authorization": `Bearer ${tok}` } }); }
+  catch { return err("Couldn't reach GitHub to check the token. Try again when you're online."); }
+  if (r.status === 401) return err("GitHub didn't accept that token. Copy it again from GitHub.");
+  if (r.status === 404) return err(`That token can't open ${sync.repo}. On GitHub, give it access to that repository.`);
+  if (!r.ok) return err(`GitHub returned an error (${r.status}). Try again.`);
+  sync.viewToken = tok; saveSync(); $("#syViewTok").value = ""; renderShare(); toast("View-only link ready.");
+}
+async function copyText(s, msg){
+  try { await navigator.clipboard.writeText(s); toast(msg); }
+  catch { const box = $("#syCodeBox"); box.value = s; box.hidden = false; box.focus(); box.select(); toast("Copy it from the box below."); }
+}
+$("#syShareCopy").onclick = () => copyText(shareLink(), "Link copied. Paste it into a message.");
+$("#syShareSend").onclick = async () => {
+  const url = shareLink();
+  if (navigator.share) { try { await navigator.share({ title: "Race calendar", text: "Race calendar (view-only). Open this on your phone:", url }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+  copyText(url, "Link copied. Paste it into a message.");
+};
+$("#syShareImg").onclick = async () => {
+  const q = shareQr(), n = q.getModuleCount(), cell = 10, m = 4 * cell, w = n * cell + 2 * m, h = w + 56;
+  const cv = document.createElement("canvas"); cv.width = w; cv.height = h; const g = cv.getContext("2d");
+  g.fillStyle = "#fff"; g.fillRect(0, 0, w, h); g.fillStyle = "#000";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) g.fillRect(m + c * cell, m + r * cell, cell, cell);
+  g.fillStyle = "#17202B"; g.font = "600 22px Arial, Helvetica, sans-serif"; g.textAlign = "center";
+  g.fillText("Race calendar · scan with your phone camera", w / 2, w + 20);
+  const blob = await new Promise(res => cv.toBlob(res, "image/png"));
+  const file = new File([blob], "race-calendar-qr.png", { type: "image/png" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: "Race calendar" }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "race-calendar-qr.png";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+};
+/* ---------- install (Chrome, Edge, Samsung Internet fire this; iPhone uses Add to Home Screen) ---------- */
+let installEvt = null;
+addEventListener("beforeinstallprompt", e => { installEvt = e; if (!STANDALONE) $("#installBtn").hidden = false; });
+addEventListener("appinstalled", () => { installEvt = null; $("#installBtn").hidden = true; toast("Race Days installed. Open it from your Home screen."); });
+$("#installBtn").onclick = async () => {
+  if (!installEvt) return;
+  installEvt.prompt(); try { await installEvt.userChoice; } catch {}
+  installEvt = null; $("#installBtn").hidden = true;
+};
 $("#syncBtn").onclick = openSync;
 function initSync(){
   if (window.claude) return;
@@ -1326,6 +1494,7 @@ function fillSeriesSelect(sel){
   if (sel) form.series.value = sel;
 }
 function openEditor(id, preset){
+  if (viewOnly() && !id) return;
   if (!state.series.length){ toast("Add a series first."); openSeries(); return; }
   editingId = id || null;
   const e = id ? state.events.find(x => x.id === id) : Object.assign({ series: state.series.find(s=>s.visible)?.id || state.series[0].id, round:"", title:"", tag:"", kind:"Race", circuit:"", country:"", start:pageStart(page()), end:pageStart(page()), race:"", status:"Confirmed", notes:"", color:null }, preset||{});
@@ -1336,6 +1505,10 @@ function openEditor(id, preset){
   $("#evTitle").textContent = id ? "Edit event" : "New event";
   $("#evDel").hidden = !id;
   $("#evErr").textContent = "";
+  const ro = viewOnly();
+  form.querySelectorAll("input, select, textarea").forEach(el => { el.disabled = ro; });
+  $("#evSave").hidden = ro; if (ro) { $("#evDel").hidden = true; $("#evTitle").textContent = "Event details"; }
+  $("#evCancel").textContent = ro ? "Close" : "Cancel";
   dlg.showModal();
   form.title.focus();
 }
@@ -1344,6 +1517,7 @@ form.color.addEventListener("input", () => form.useColor.checked = true);
 form.start.addEventListener("change", () => { if (!form.end.value || form.end.value < form.start.value) form.end.value = form.start.value; });
 form.addEventListener("submit", ev => {
   ev.preventDefault();
+  if (viewOnly()) { dlg.close(); return; }
   const v = k => form[k].value.trim();
   const err = t => { $("#evErr").textContent = t; };
   if (!v("title")) return err("Give the event a name.");
@@ -1485,6 +1659,7 @@ $("#optClash").onchange = e => { prefs.clash = e.target.checked; lsSet(PREF_KEY,
 $("#optIncome").onchange = e => { prefs.income = e.target.checked; lsSet(PREF_KEY, prefs); renderView(); };
 $("#view").addEventListener("change", e => {
   const t = e.target;
+  if (viewOnly() && t.matches(".dsel, .stc select")) { renderView(); toast("View-only: this calendar can't be changed here."); return; }
   if (t.matches(".dsel")){
     const o = monthSt(t.dataset.month, true);
     if (t.value) o[t.dataset.day] = t.value; else delete o[t.dataset.day];
