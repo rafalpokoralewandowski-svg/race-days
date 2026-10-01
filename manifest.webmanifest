@@ -1,0 +1,30 @@
+{
+  "name": "Race Days: Endurance, GT & Formula E",
+  "short_name": "Race Days",
+  "description": "IMSA, WEC, NLS, GT World Challenge Europe and Formula E calendar with conflicts, truck departures and your work days.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F2F4F6",
+  "theme_color": "#17202B",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

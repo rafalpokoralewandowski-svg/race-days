@@ -1,0 +1,78 @@
+RACE DAYS: iPhone home-screen app with desktop sync
+====================================================
+
+What this folder is
+  index.html            the calendar (IMSA, WEC, NLS, GTWC Europe, Formula E, truck, work status)
+  manifest.webmanifest  app name, colours and icons
+  sw.js                 keeps a copy on the phone so the app opens without signal
+  icons/                app icon in every size iOS asks for (icon-1024.png is the master)
+
+
+1. PUT THE APP ONLINE (once)
+iPhones only install home-screen apps from a web address. Both options are free.
+Upload the CONTENTS of this folder (index.html at the top level).
+
+  Option A: GitHub Pages (stays up permanently)
+    1. On your computer, sign in at github.com (free account).
+    2. New repository, name it race-days, set it to Public, Create.
+    3. Click "uploading an existing file", drag in index.html, manifest.webmanifest, sw.js
+       and the icons folder, then Commit changes.
+    4. Settings > Pages > Source: Deploy from a branch > Branch: main, folder / (root) > Save.
+    5. After a minute your address is https://YOUR-USERNAME.github.io/race-days/
+
+  Option B: Netlify Drop
+    1. Open app.netlify.com/drop on your computer and drag this whole folder onto the page.
+    2. Create the free account it offers so the site is kept, and note the address it gives you.
+
+
+2. INSTALL ON THE IPHONE
+  1. Open the address in Safari (not Chrome).
+  2. Tap Share, then Add to Home Screen. Keep the name Race Days or type your own, then Add.
+  3. Open it from the home screen once while online. After that it also works offline.
+
+
+3. SYNC COMPUTER AND IPHONE (once)
+Each copy of the calendar saves to the device it runs on. Sync keeps them the same by storing
+the calendar as calendar.json in a PRIVATE GitHub repository of yours.
+
+  a. On github.com: New repository, name it race-days-data, set it to Private, tick
+     "Add a README", Create. (Separate from the public race-days repository that holds the app.)
+  b. Make an access token: your picture (top right) > Settings > Developer settings >
+     Personal access tokens > Fine-grained tokens > Generate new token.
+       Repository access: Only select repositories > race-days-data
+       Permissions > Add permissions > Contents, then set it to Read and write
+     Choose an expiry, Generate token, and copy it (GitHub shows it only once).
+  c. Connect FIRST on the device that has your latest edits, usually the computer. Open the
+     calendar there (the Endurance_GT_FE_Calendar_2027_offline.html file in Chrome or Edge, or
+     the app's web address in any browser), click Sync, enter YOUR-USERNAME/race-days-data,
+     paste the token, Connect. That device's calendar is uploaded.
+  d. Still in Sync on the computer, choose Show QR for iPhone. Check the App address under the
+     code is your app's web address (it guesses https://YOUR-USERNAME.github.io/race-days/).
+  e. On the iPhone open the Camera, point it at the code and tap the link that appears.
+     Safari opens the app page with a "Connect Race Days" box: tap Copy setup code.
+  f. Open Race Days from the Home Screen (not the Safari tab), tap Sync, press and hold the
+     token box, tap Paste, then Connect. The phone loads your calendar from GitHub.
+     The Home Screen app keeps its own storage, separate from Safari, which is why the code
+     travels by the clipboard. Hide the QR on the computer afterwards: it contains your token.
+     Without the QR: make a second token on the iPhone in Safari (same steps as b) and paste it
+     into Sync in the app together with the repository name.
+
+How it behaves
+  - A change on one device is saved to GitHub within a few seconds. The other device picks it
+    up when you open it or switch back to it, and every minute while it's open and online.
+  - Offline edits (phone at the track, no signal) are kept and merged when the device is back
+    online: different events, different fields of an event and different days all combine.
+    If both devices changed the same field of the same event, the device that syncs last wins.
+  - Every save is a commit in race-days-data, so earlier versions stay in its history on GitHub.
+  - Sync dot: green = in step, amber = saving or offline, red = needs attention (open Sync).
+  - Events, series (colours and Show ticks) and work statuses sync. The view you're on
+    (strip, months, list, page, light/dark) stays per device.
+  - If the token expires or is revoked, Sync says so. Make a new token and paste it into Sync.
+
+Good to know
+  - The app's web address is public to anyone who has it, but it only shows the published
+    event calendar. Your statuses and edits live on your devices and in your private repository.
+  - The token is stored inside the app on each device and can only open race-days-data.
+    Revoke it on GitHub (Settings > Developer settings) if a device is lost.
+  - To update the app later: replace index.html online and change VERSION at the top of sw.js
+    (any new text) so phones pick up the new copy the next time the app opens online.
